@@ -1,3 +1,6 @@
 from django.contrib import admin
+from .models import Insurance, Discount
 
-# Register your models here.
+
+admin.site.register(Insurance)
+admin.site.register(Discount)
