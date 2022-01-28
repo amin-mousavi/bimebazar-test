@@ -1,14 +1,17 @@
 from random import choices, choice
 from string import ascii_letters
-from tabnanny import check
+from django.db.models import Sum
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import permissions
+from .permissions import IsSuperUser
 
 from .models import Discount, Insurance
-from .serializers import DiscountSerializer, DiscountSerializerForGet
-
+from .serializers import (
+        DiscountSerializer,
+        DiscountSerializerForGet,
+        DiscountSuperUserSerializer,
+    )
 
 def generate_third_discount():
     third_discounts = [100000, 200000, 1000000]
@@ -79,3 +82,37 @@ class DiscountView(APIView):
                 serializer.errors, 
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+
+class ListDiscountForSuperUser(APIView):
+
+    serializer_class = DiscountSuperUserSerializer
+    serializer_class_get = DiscountSerializerForGet
+    permission_classes = (IsSuperUser,)
+
+    def get(self, request, format=None):
+        return Response({'method':'get'})
+        
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+
+        if serializer.is_valid():
+            date = serializer.validated_data.get('date')
+            insurance_type = serializer.validated_data.get('type')
+            insurance_test = Insurance.objects.get(type=insurance_type)
+
+            objects = Discount.objects.filter(created_date__hour = date.hour, type=insurance_test)
+            total = objects.aggregate(Sum('amount'))
+            serialize_object = self.serializer_class_get(objects, many=True)
+            return Response({
+                'total': total,
+                'discounts': serialize_object.data,
+                
+            })
+        
+        else:
+            return Response(
+            serializer.errors, 
+            status=status.HTTP_400_BAD_REQUEST
+        )

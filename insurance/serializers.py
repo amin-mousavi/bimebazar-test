@@ -1,7 +1,7 @@
-from pyexpat import model
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import Insurance, Discount
+
+from .models import Discount
 from .models import INSURANCE_TYPE
 
 
@@ -16,6 +16,13 @@ class DiscountSerializer(serializers.ModelSerializer):
         model = Discount
         fields = ('type',)
 
+class DiscountSuperUserSerializer(serializers.ModelSerializer):
+    type = serializers.ChoiceField(choices = INSURANCE_TYPE)
+    date = serializers.DateTimeField()
+    class Meta:
+        model = Discount
+        fields = ('type', 'date')
+
 class DiscountSerializerForGet(serializers.ModelSerializer):
     type = serializers.ChoiceField(choices = INSURANCE_TYPE)
     user = UserSerializer()
@@ -23,7 +30,3 @@ class DiscountSerializerForGet(serializers.ModelSerializer):
         model = Discount
         exclude = ('id', )
 
-# class InsuranceSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Insurance
-#         fields = '__all__'
