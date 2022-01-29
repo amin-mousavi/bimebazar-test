@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 
 INSURANCE_TYPE = (
     ('Third', 'ثالث'),
-    ('body','بدنه'),
+    ('Body','بدنه'),
 )
 class Insurance(models.Model):
 
