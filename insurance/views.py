@@ -61,7 +61,6 @@ class DiscountView(APIView):
             insurance_type = serializer.validated_data.get('type')
             insurance_test = get_object_or_404(Insurance, type=insurance_type)
 
-            
             discount_amount = 0
             if insurance_type == 'Third':
                 discount_amount = generate_third_discount()
@@ -103,7 +102,6 @@ class ListDiscountForSuperUser(APIView):
 
     serializer_class = DiscountSuperUserSerializer
     serializer_class_get = DiscountSerializerForGet
-
     permission_classes = (IsSuperUser,)
 
     def get(self, request, format=None):
@@ -127,7 +125,6 @@ class ListDiscountForSuperUser(APIView):
             date = serializer.validated_data.get('date')
             insurance_type = serializer.validated_data.get('type')
             insurance_test = get_object_or_404(Insurance, type=insurance_type)
-
 
             objects = Discount.objects.filter(created_date__hour = date.hour, type=insurance_test)
             total = objects.aggregate(Sum('amount'))
